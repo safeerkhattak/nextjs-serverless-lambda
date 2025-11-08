@@ -1,0 +1,41 @@
+service: nextjs-serverless-lambda
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  memorySize: 1024
+  timeout: 30
+  httpApi:
+    cors: true
+  environment:
+    NODE_ENV: production
+
+package:
+  patterns:
+    - '!.next/cache/**'
+    - '!.git/**'
+    - '!.env*'
+    - '!node_modules/.cache/**'
+    - '.next/standalone/**'
+    - '.next/static/**'
+    - '.next/server/**'
+    - 'public/**'
+    - 'handler.js'
+
+functions:
+  nextjs:
+    handler: handler.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
+    timeout: 30
+    memorySize: 1024
+
